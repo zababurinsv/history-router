@@ -84,7 +84,7 @@ Router.prototype.post = function(path, callback, middlewares) {
  * el - wrapper element
  */
 
-Router.prototype.init = function(options, callback, middlewares) {
+Router.prototype.init = function(options, middlewares) {
   this._base = options.base || '/';
   this._wrapper = document.querySelector(options.el);
   /** history.js */ 
@@ -100,7 +100,10 @@ Router.prototype.init = function(options, callback, middlewares) {
   /** Tags */
   Tag.form(_self); Tag.anchor(_self);
   /** Register base */
-  _self.get('/', callback, middlewares || new Array());
+  _self.get('/', function() {
+    let view = _self._wrapper.querySelector('*[data-role="router-view"]');
+    view.innerHTML = new String();
+  }, middlewares || new Array());
 }
 
 /**

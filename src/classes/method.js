@@ -40,16 +40,15 @@ Method.get = function(router, option, query, state) {
     let isPassed = Middleware.run(data, router, option);
     isPassed? resolve(isPassed): reject();
   }).then(function() {
-    /** Clear */
-    router._wrapper.innerHTML = new String();
     /** Addding done function */
     let done = function(response) {
       if(response) {
+        let view = router._wrapper.querySelector('*[data-role="router-view"]');
         if(Util.isElement(response)) {
-          router._wrapper.appendChild(response);
+          view.appendChild(response);
         }
         else {
-          router._wrapper.innerHTML = response;
+          view.innerHTML = response;
         }
       }
     }

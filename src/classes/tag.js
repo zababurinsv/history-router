@@ -17,7 +17,7 @@ function Tag() {
  */
 Tag.form = function(router) {
   let 
-    forms = router._wrapper.getElementsByTagName('form')
+    forms = router._wrapper.querySelectorAll('form[data-role="router-form"]')
   ;
   for(let i=0; i < forms.length; i++) {
     forms[i].addEventListener('submit', function(e) {
@@ -60,7 +60,7 @@ Tag.form = function(router) {
  */
 Tag.anchor = function(router) {
   let
-    links = router._wrapper.querySelectorAll('a')
+    links = router._wrapper.querySelectorAll('a[data-role="router-link"]')
   ;
   
   for(let i=0; i < links.length; i++) {

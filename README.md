@@ -10,11 +10,20 @@ with **Node.js**
 npm install --save history-router
 ```
 
+# Release Note
+
+### 1.1
+
+* Remove; ```Router.init``` callback.
+* Add; ```data-role="router-view"```, ```data-role="router-link"```, ```data-role="router-form"```.
+* Now, wrapper element content is not cleared anymore.
+
 # Basic usage
 
 ```html
 <div id="app">
-  <a href="/user">user</a>
+  <a href="/user" data-role="router-link">user</a>
+  <div data-role="router-view"></div>
 </div>
 ```
 
@@ -29,13 +38,8 @@ Router.get('/user', ({ done }) => {
   done('<h1>USER</h1>');
 });
 
-/** index */
-let index = document.getElementsByTagName('a')[0];
-
 Router.init({
   el: '#app'
-}, ({ done }) => {
-  done(index)
 })
 ```
 
@@ -43,14 +47,13 @@ Router.init({
 
 ### Router
 
-#### Router.init(options: object, callback: Function, middlewares: Array)
+#### Router.init(options: object, middlewares: Array)
 
 You must call ```Router.init``` for initialing Router.
 
 ##### Parameters
 
 * options: object - Router init options.
-* callback : Function - Pushed state; callback.
 * middlewares: Base path route middlewares.
 
 ##### Options
@@ -67,9 +70,7 @@ You must call ```Router.init``` for initialing Router.
 ```javascript
 Router.init({
   el: '#app',
-  base '/'
-}, ( /** Parameters */ ) => {
-  // ...
+  base: '/'
 }, [ /* middleware: Function */ ])
 ```
 
@@ -151,7 +152,7 @@ For ```get``` request
 
 ```html
 <!-- http://__DOMAIN__/__BASE__/user?name=foo -->
-<a href="/user?name=foo">user</a>
+<a href="/user?name=foo" data-role="router-link">user</a>
 ```
 
 ```javascript
@@ -165,7 +166,7 @@ For ```post``` request
 
 ```html
 <!-- http://__DOMAIN__/__BASE__/user?name=foo -->
-<a href="/user" data-method="post" data-params='{"name":"foo"}'>user</a>
+<a href="/user" data-method="post" data-params='{"name":"foo"}' data-role="router-link">user</a>
 ```
 
 ```javascript
@@ -181,7 +182,7 @@ Router.post('/user', ({ params }) => {
 
 ```html
 <!-- form -->
-<form method="get" action="/user">
+<form method="get" action="/user" data-role="router-form">
   <input type="text" placeholder="search..." name="search">
   <input type="submit">
 </form>
@@ -274,3 +275,5 @@ Router.get('/user', ({ request, done }) => {
 # License
 
 MIT
+
+Copyright (c) Mansu Jeong. All rights reserved.
