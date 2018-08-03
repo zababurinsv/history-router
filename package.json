@@ -1,0 +1,33 @@
+{
+  "name": "history-router",
+  "version": "1.0.0",
+  "description": "Router for history",
+  "main": "index.js",
+  "author": {
+    "name": "Mansu Jeong",
+    "email": "pronist@naver.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "email": "pronist@naver.com"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "keywords": [
+    "router",
+    "history",
+    "history-router"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pronist/history-router.git"
+  },
+  "dependencies": {
+    "form-serialize": "^0.7.2",
+    "history": "^4.7.2"
+  }
+}
