@@ -44,6 +44,8 @@ Method.get = function(router, option, query, state) {
     let done = function(response) {
       if(response) {
         let view = router._wrapper.querySelector('*[data-role="router-view"]');
+        /** Clear */
+        view.innerHTML = new String();
         if(Util.isElement(response)) {
           view.appendChild(response);
         }

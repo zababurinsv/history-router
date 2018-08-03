@@ -14,7 +14,7 @@ npm install --save history-router
 
 ### 1.1
 
-* Remove; ```Router.init``` callback.
+* ~~Remove; ```Router.init``` callback.~~
 * Add; ```data-role="router-view"```, ```data-role="router-link"```, ```data-role="router-form"```.
 * Now, wrapper element content is not cleared anymore.
 
@@ -47,13 +47,14 @@ Router.init({
 
 ### Router
 
-#### Router.init(options: object, middlewares: Array)
+#### Router.init(options: object, callback: Function, middlewares: Array)
 
 You must call ```Router.init``` for initialing Router.
 
 ##### Parameters
 
 * options: object - Router init options.
+* callback: Function - Pushed state and onLoad; callback.
 * middlewares: Base path route middlewares.
 
 ##### Options
@@ -71,6 +72,8 @@ You must call ```Router.init``` for initialing Router.
 Router.init({
   el: '#app',
   base: '/'
+}, ({ done }) => {
+  /** Callback */
 }, [ /* middleware: Function */ ])
 ```
 

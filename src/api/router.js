@@ -73,7 +73,7 @@ Router.prototype.post = function(path, callback, middlewares) {
  * @method
  * 
  * @param {object} options - Router init options
- * @param {Function} callback - Pushed state; callback
+ * @param {Function} callback - Pushed state and onLoad; callback
  * @param {Array} middlewares - Base path route middlewares
  */
 
@@ -84,7 +84,7 @@ Router.prototype.post = function(path, callback, middlewares) {
  * el - wrapper element
  */
 
-Router.prototype.init = function(options, middlewares) {
+Router.prototype.init = function(options, callback, middlewares) {
   this._base = options.base || '/';
   this._wrapper = document.querySelector(options.el);
   /** history.js */ 
@@ -95,15 +95,16 @@ Router.prototype.init = function(options, middlewares) {
   let 
     _self = this
   ;
-  /** history.listen */
-  Core.listen(_self);
-  /** Tags */
-  Tag.form(_self); Tag.anchor(_self);
   /** Register base */
-  _self.get('/', function() {
+  _self.get('/', function(params) {
     let view = _self._wrapper.querySelector('*[data-role="router-view"]');
     view.innerHTML = new String();
+    callback(params);
   }, middlewares || new Array());
+  /** Tags */
+  Tag.form(_self); Tag.anchor(_self);
+  /** history.listen */
+  Core.listen(_self);
 }
 
 /**
