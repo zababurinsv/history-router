@@ -24,12 +24,14 @@ function Core() {
  * @param {object} router - history-router.Router
  */
 Core.listen = function(router) {
-  /** index */
-  Method.get(
-    router, 
-    router._paths[router._paths.length-1], 
-    '/', null
-  );
+  if(((location.pathname).split('?'))[0] == '/') {
+    /** index */
+    Method.get(
+      router, 
+      router._paths[router._paths.length-1], 
+      '/', null
+    );
+  }
   router.history.listen(function(location) {
     for(let i =0; i< router._paths.length; i++ ) {
       let

@@ -27,7 +27,6 @@ function Router() {
   this.history = null;
 
    /** private */
-  this._base = null;
   this._wrapper = null;
   this._index = null;
   this._paths = new Array();
@@ -85,11 +84,10 @@ Router.prototype.post = function(path, callback, middlewares) {
  */
 
 Router.prototype.init = function(options, callback, middlewares) {
-  this._base = options.base || '/';
   this._wrapper = document.querySelector(options.el);
   /** history.js */ 
   this.history = createHistory({
-    basename: this._base
+    basename: '/'
   });
   /** Router */
   let 

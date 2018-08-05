@@ -10,14 +10,6 @@ with **Node.js**
 npm install --save history-router
 ```
 
-# Release Note
-
-### 1.1
-
-* ~~Remove; ```Router.init``` callback.~~
-* Add; ```data-role="router-view"```, ```data-role="router-link"```, ```data-role="router-form"```.
-* Now, wrapper element content is not cleared anymore.
-
 # Basic usage
 
 ```html
@@ -59,7 +51,6 @@ You must call ```Router.init``` for initialing Router.
 
 ##### Options
 
-* base: string - history base path
 * el: string - wrapper element
 
 ##### Usage
@@ -70,8 +61,7 @@ You must call ```Router.init``` for initialing Router.
 
 ```javascript
 Router.init({
-  el: '#app',
-  base: '/'
+  el: '#app'
 }, ({ done }) => {
   /** Callback */
 }, [ /* middleware: Function */ ])
@@ -154,7 +144,7 @@ Router.middleware(({ next }) => {
 For ```get``` request
 
 ```html
-<!-- http://__DOMAIN__/__BASE__/user?name=foo -->
+<!-- http://__DOMAIN__/user?name=foo -->
 <a href="/user?name=foo" data-role="router-link">user</a>
 ```
 
