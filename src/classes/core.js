@@ -24,23 +24,19 @@ function Core() {
  * @param {object} router - history-router.Router
  */
 Core.listen = function(router) {
-  if(((location.pathname).split('?'))[0] == '/') {
-    /** index */
-    Method.get(
-      router, 
-      router._paths[router._paths.length-1], 
-      '/', null
-    );
-  }
   router.history.listen(function(location) {
+    /** clear */
+    let view = router._wrapper.querySelector('*[data-role="router-view"]');
+    view.innerHTML = new String();
+    /** find route path */
     for(let i =0; i< router._paths.length; i++ ) {
       let
-        option = router._paths[i]
+        route = router._paths[i]
       ;
-      if(((location.pathname).split('?'))[0] == `${option.path}`) {
-        if(option.method == 'get') {
+      if(((location.pathname).split('?'))[0] == `${route.path}`) {
+        if(route.method == 'get') {
           /** parse query string */
-          Method.get(router, option, location.search, location.state);
+          Method.get(router, route, location.search, location.state);
           break;
         }
       }

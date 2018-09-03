@@ -26,13 +26,11 @@ const historyRouter = require('history-router');
 const Router = new historyRouter.Router();
 // ...
 
-Router.get('/user', ({ done }) => {
-  done('<h1>USER</h1>');
+Router.get('/', ({ done }) => {
+  done('<h1>INDEX</h1>');
 });
 
-Router.init({
-  el: '#app'
-})
+Router.init({ el: '#app' });
 ```
 
 # Methods
@@ -60,14 +58,12 @@ You must call ```Router.init``` for initialing Router.
 ```
 
 ```javascript
-Router.init({
-  el: '#app'
-}, ({ done }) => {
-  /** Callback */
-}, [ /* middleware: Function */ ])
+Router.init({ el: '#app' });
 ```
 
 #### Router.get(path: string, callback: Function, middlewares: Array)
+
+**It's not real http request**
 
 ##### Parameters
 
@@ -84,6 +80,8 @@ Router.get('/user', ( /** Parameters */ ) => {
 ```
 
 #### Router.post(path: string, callback: Function, middlewares: Array)
+
+**It's not real http request**
 
 ##### Parameters
 

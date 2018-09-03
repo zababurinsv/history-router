@@ -6,6 +6,10 @@
 
 let instance = null;
 
+const 
+  Middleware = require('./middleware')
+;
+
 /** 
  * history-router Request
  * @class
@@ -64,19 +68,31 @@ Request.prototype.request = function(options) {
   return new Promise(function(resolve, reject) {
     for(let i =0; i< _self._router._paths.length; i++ ) {
       let
-        option = _self._router._paths[i],
-        _params = { params: options.params };
+        route = _self._router._paths[i],
+        data = { params: options.params }
       ;
-      if(option.method == options.method) {
+      if(route.method == options.method) {
         /** if location same to routed path  */
-        if(((`${options.url}`).split('?'))[0] == `${option.path}`) {
+        if(((`${options.url}`).split('?'))[0] == `${route.path}`) {
           if(options.method == 'post') {
-            let done = function(data) {
-              resolve(data);
+            let done = function(response) {
+              resolve(response);
             };
-            Object.assign(_params, { done });
+            Object.assign(data, { done });
           }
-          option.params(_params)
+          new Promise(function(resolve, reject) {
+            let isPassed = Middleware.run(data, _self._router, route);
+            isPassed
+              ? resolve(isPassed)
+              : reject()
+            ;
+          }).then(function() {
+            /** call the callback which is registered */
+            typeof route.params === 'function'
+              ? route.params(data)
+              : null
+            ;
+          })
           break;
         }
       }

@@ -14,11 +14,11 @@ function Method() {
  * @static
  * 
  * @param {object} router - router
- * @param {object} option - path option
+ * @param {object} route - path route
  * @param {string} query - URL query string
  * @param {object} state - state
  */
-Method.get = function(router, option, query, state) {
+Method.get = function(router, route, query, state) {
   let redirect = function(path, state) {
     router.history.push(path, state);
   }
@@ -26,7 +26,11 @@ Method.get = function(router, option, query, state) {
   request.setRouter(router);
   let 
     urlParams = Util.parseQueryString(query),
-    data = new Object({ params: urlParams, redirect, request: request.request });
+    data = new Object({ 
+      params: urlParams, 
+      redirect, 
+      request: request.request 
+    });
   ;
   if(state !== undefined && state) {
     if(state.formData !== undefined && state.formData) {
@@ -37,15 +41,17 @@ Method.get = function(router, option, query, state) {
     }
   }
   new Promise(function(resolve, reject) {
-    let isPassed = Middleware.run(data, router, option);
-    isPassed? resolve(isPassed): reject();
+    let isPassed = Middleware.run(data, router, route);
+    isPassed
+      ? resolve(isPassed)
+      : reject()
+    ;
   }).then(function() {
-    /** Addding done function */
+    /** Adding done function */
     let done = function(response) {
       if(response) {
-        let view = router._wrapper.querySelector('*[data-role="router-view"]');
         /** Clear */
-        view.innerHTML = new String();
+        let view = router._wrapper.querySelector('*[data-role="router-view"]');
         if(Util.isElement(response)) {
           view.appendChild(response);
         }
@@ -56,8 +62,8 @@ Method.get = function(router, option, query, state) {
     }
     Object.assign(data, { done });
     /** call the callback which is registered */
-    typeof option.params === 'function'
-      ? option.params(data)
+    typeof route.params === 'function'
+      ? route.params(data)
       : null
     ;
   });
@@ -69,11 +75,11 @@ Method.get = function(router, option, query, state) {
  * @static
  * 
  * @param {object} router - router
- * @param {object} option - path option
+ * @param {object} route - route
  * @param {string} formData - form data
  * @param {object} params - params
  */
-Method.post = function(router, option, params) {
+Method.post = function(router, route, params) {
   let redirect = function(path, state) {
     router.history.push(path, state);
   }
@@ -85,12 +91,15 @@ Method.post = function(router, option, params) {
   ;
   Object.assign(data, params);
   new Promise(function(resolve, reject) {
-    let isPassed = Middleware.run(data, router, option);
-    isPassed? resolve(isPassed): reject();
+    let isPassed = Middleware.run(data, router, route);
+    isPassed
+      ? resolve(isPassed)
+      : reject()
+    ;
   }).then(function() {
     /** call the callback which is registered */
-    typeof option.params === 'function'
-      ? option.params(data)
+    typeof route.params === 'function'
+      ? route.params(data)
       : null
     ;
   })

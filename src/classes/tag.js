@@ -20,31 +20,32 @@ Tag.form = function(router) {
     forms = router._wrapper.querySelectorAll('form[data-role="router-form"]')
   ;
   for(let i=0; i < forms.length; i++) {
+    let form = {
+      method: forms[i].getAttribute('method') || 'get',
+      path: forms[i].getAttribute('action') || '/',
+    }
     forms[i].addEventListener('submit', function(e) {
       let
-        _target = e.target,
-        _method = _target.getAttribute('method'),
-        _path = _target.getAttribute('action'),
-        _url = Util.getPathWithoutDomain(_path)
+        url = Util.getPathWithoutDomain(form.path)
       ;
       for(let i =0; i< router._paths.length; i++ ) {
         let
-          option = router._paths[i]
+          route = router._paths[i]
         ;
         /** if same to routed path  */
-        if(`${(_url.split('?'))[0]}` == `${option.path}`) {
+        if(`${(url.split('?'))[0]}` == `${route.path}`) {
           e.preventDefault();
           let 
-            formData = serialize(_target, { hash: true })
+            formData = serialize(e.target, { hash: true })
           ;
           /** GET */
-          if(option.method == 'get' && _method == 'get') {
-            router.history.push(_url, { formData });
+          if(route.method == 'get' && form.method == 'get') {
+            router.history.push(url, { formData });
             break;
           }
           /** POST */
-          else if(option.method == 'post' && _method == 'post') {
-            Method.post(router, option, { formData: formData });
+          else if(route.method == 'post' && form.method == 'post') {
+            Method.post(router, route, { formData });
           }
         }
       };
@@ -62,43 +63,34 @@ Tag.anchor = function(router) {
   let
     links = router._wrapper.querySelectorAll('a[data-role="router-link"]')
   ;
-  
   for(let i=0; i < links.length; i++) {
     /** Getting Attributes */
-    let
-      _link = links[i].dataset.href == null
-        ? links[i].getAttribute('href')
-        : links[i].dataset.href
-      ,
-      _method = links[i].dataset.method == null 
-        ? 'get'
-        : links[i].dataset.method
-      ,
-      _params = links[i].dataset.params == null
-        ? "{}"
-        : links[i].dataset.params
-    ;
+    let anchor = {
+      link: links[i].dataset.href || links[i].getAttribute('href'),
+      method: links[i].dataset.method || 'get',
+      params: links[i].dataset.params || '{}'
+    }
     /** Click event */
     links[i].addEventListener('click', function(e) {
       e.preventDefault();
       let 
-        _url = Util.getPathWithoutDomain(_link)
+        _url = Util.getPathWithoutDomain(anchor.link)
       ;
       for(let i =0; i< router._paths.length; i++ ) {
         let
-          option = router._paths[i]
+          route = router._paths[i]
         ;
         /** if same to routed path  */
-        if(`${(_url.split('?'))[0]}` == `${option.path}`) {
+        if(`${(_url.split('?'))[0]}` == `${route.path}`) {
           /** GET */
-          if(option.method == 'get' && _method == 'get') {
+          if(route.method == 'get' && anchor.method == 'get') {
             /** History */
             router.history.push(_url);
             break;
           }
           /** POST */
-          else if(option.method == 'post' && _method == 'post') {
-            Method.post(router, option, { params: JSON.parse(_params) });
+          else if(route.method == 'post' && anchor.method == 'post') {
+            Method.post(router, route, { params: JSON.parse(anchor.params) });
           }
         }
       };

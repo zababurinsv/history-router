@@ -10,7 +10,8 @@
 
 const 
   Core = require('../classes/core'),
-  Tag = require('../classes/tag')
+  Tag = require('../classes/tag'),
+  Method = require('../classes/method')
 ;
 
 /** history.js */
@@ -72,8 +73,6 @@ Router.prototype.post = function(path, callback, middlewares) {
  * @method
  * 
  * @param {object} options - Router init options
- * @param {Function} callback - Pushed state and onLoad; callback
- * @param {Array} middlewares - Base path route middlewares
  */
 
 /**
@@ -83,26 +82,24 @@ Router.prototype.post = function(path, callback, middlewares) {
  * el - wrapper element
  */
 
-Router.prototype.init = function(options, callback, middlewares) {
+Router.prototype.init = function(options) {
   this._wrapper = document.querySelector(options.el);
   /** history.js */ 
   this.history = createHistory({
     basename: '/'
   });
-  /** Router */
-  let 
-    _self = this
-  ;
-  /** Register base */
-  _self.get('/', function(params) {
-    let view = _self._wrapper.querySelector('*[data-role="router-view"]');
-    view.innerHTML = new String();
-    callback(params);
-  }, middlewares || new Array());
   /** Tags */
-  Tag.form(_self); Tag.anchor(_self);
+  Tag.form(this); Tag.anchor(this);
   /** history.listen */
-  Core.listen(_self);
+  Core.listen(this);
+  /** index */
+  if(((location.pathname).split('?'))[0] == '/') {
+    Method.get(this, this._paths.find(
+      function(route) {
+        return route.path == '/'
+      }), 
+    '/', null);
+  }
 }
 
 /**
@@ -127,9 +124,9 @@ Router.prototype.use = function(base, router) {
     _self = this
   ;
   /** Paths */
-  router._paths.forEach(function(option, i) {
-    option.path = path.join(base, option.path);
-    _self._paths.push(option);
+  router._paths.forEach(function(route, i) {
+    route.path = path.join(base, route.path);
+    _self._paths.push(route);
   });
   /** Middlewares */
   router._middlewares.forEach(function(middleware) {

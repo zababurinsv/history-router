@@ -12,10 +12,10 @@ function Middleware() {
  * 
  * @param {object} data - callback parameters
  * @param {object} router - router
- * @param {string} option - route meta
+ * @param {string} route - route meta
  * @param {boolean} isRoute - route? global?
  */
-Middleware.__middleware = function(data, router, option, isRoute) {
+Middleware.__middleware = function(data, router, route, isRoute) {
   let 
     middleware = data,
     isPassed = false
@@ -24,28 +24,23 @@ Middleware.__middleware = function(data, router, option, isRoute) {
     isPassed = is;
   }
   Object.assign(middleware, { next });
-
   let iterator = 0;
-
   if(isRoute) {
     /** Route Middleware */
     do {
-      option.middlewares[iterator](middleware); 
+      route.middlewares[iterator](middleware); 
       iterator++;
-
-    } while((iterator < option.middlewares.length) && isPassed)
+    } while((iterator < route.middlewares.length) && isPassed)
   }
   else {
-    /** Global Middleware */    
+    /** Global Middleware */
     do {
       router._middlewares[iterator](middleware);
-      iterator++;
-      
+      iterator++;   
     } while((iterator < router._middlewares.length) && isPassed)
   }
   return isPassed;
 }
-
 
 /** 
  * Global, or Route Middleware processing 
@@ -55,19 +50,19 @@ Middleware.__middleware = function(data, router, option, isRoute) {
  * 
  * @param {object} data - callback parameters
  * @param {object} router - router
- * @param {string} option - route meta
+ * @param {string} route - route meta
  */
-Middleware.run = function(data, router, option) {
+Middleware.run = function(data, router, route) {
   /** Global middleware */
   let isPassed = router._middlewares.length == 0
     ? true
-    : Middleware.__middleware(data, router, option, false)
+    : Middleware.__middleware(data, router, route, false)
   ;
   /** Route middleware */
   if(isPassed || router._middlewares.length == 0) {
-    isPassed = option.middlewares.length == 0
+    isPassed = route.middlewares.length == 0
       ? true
-      : Middleware.__middleware(data, router, option, true)
+      : Middleware.__middleware(data, router, route, true)
     ;
   }
   return isPassed;
