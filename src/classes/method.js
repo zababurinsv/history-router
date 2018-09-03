@@ -76,7 +76,6 @@ Method.get = function(router, route, query, state) {
  * 
  * @param {object} router - router
  * @param {object} route - route
- * @param {string} formData - form data
  * @param {object} params - params
  */
 Method.post = function(router, route, params) {

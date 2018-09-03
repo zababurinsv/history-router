@@ -50,7 +50,7 @@ Middleware.__middleware = function(data, router, route, isRoute) {
  * 
  * @param {object} data - callback parameters
  * @param {object} router - router
- * @param {string} route - route meta
+ * @param {string} route - route
  */
 Middleware.run = function(data, router, route) {
   /** Global middleware */

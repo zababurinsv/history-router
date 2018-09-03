@@ -78,7 +78,6 @@ Router.prototype.post = function(path, callback, middlewares) {
 /**
  * OPTIONS
  * 
- * base - base path
  * el - wrapper element
  */
 

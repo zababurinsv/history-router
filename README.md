@@ -44,8 +44,6 @@ You must call ```Router.init``` for initialing Router.
 ##### Parameters
 
 * options: object - Router init options.
-* callback: Function - Pushed state and onLoad; callback.
-* middlewares: Base path route middlewares.
 
 ##### Options
 
