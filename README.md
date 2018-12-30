@@ -4,261 +4,148 @@ Router for history
 
 # Installation
 
-with **Node.js**
+```bash
+bower install history-router --save
+```
+
+or,
 
 ```bash
 npm install --save history-router
 ```
 
+# Includes
+
+with **bower**
+
+```html
+<body>
+  <script src="bower_components/history-router/dist/history-router.js"></script>
+</body>
+```
+
+or **cdn**
+
+```html
+<script src="https://unpkg.com/history-router"></script>
+```
+
+with **Bundlers** webpack etc.
+
+```javascript
+import HistoryRouter from 'history-router'
+```
+
 # Basic usage
 
 ```html
-<div id="app">
-  <a href="/user" data-role="router-link">user</a>
-  <div data-role="router-view"></div>
-</div>
+<a href="#">Link to somewhere</a>
+
+<script src="https://unpkg.com/history-router"></script>
+<script>
+  let link = document.getElementsByTagName('a')[0],
+      router = new HistoryRouter({
+        hash: false // default: true
+      })
+  ;
+  /** Route '/user' with parameters */
+  router.when('/user/:id', ({ params }) => console.log(params.id));
+  
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    /** https://github.com/ReactTraining/history */
+    router.history.push('/user/32');
+  });
+</script>
 ```
 
 ```javascript
-const historyRouter = require('history-router');
+const HistoryRouter = require('history-router');
 
 /** history-router Router **/
-const Router = new historyRouter.Router();
+const router = new HistoryRouter({ hash: false });
 // ...
 
-Router.get('/', ({ done }) => {
-  done('<h1>INDEX</h1>');
-});
-
-Router.init({ el: '#app' });
+/** Route '/user' with parameters */
+router.when('/user/:id', ({ params }) => console.log(params.id));
 ```
 
 # Methods
 
-### Router
+### HistoryRouter(options: object)
 
-#### Router.init(options: object, callback: Function, middlewares: Array)
+Create HistoryRouter Instance
 
-You must call ```Router.init``` for initialing Router.
+|Name|default|description|
+-----|-------|-----------|
+|hash|true|Using hash mode|
+|history|{}|<https://github.com/ReactTraining/history>|
 
-##### Parameters
-
-* options: object - Router init options.
-
-##### Options
-
-* el: string - wrapper element
-
-##### Usage
-
-```html
-<div id="app"></div>
-```
+#### Usage
 
 ```javascript
-Router.init({ el: '#app' });
+let router = new HistoryRouter({ hash: false });
 ```
 
-#### Router.get(path: string, callback: Function, middlewares: Array)
+### HistoryRouter.when(path: string, callback: Function, middlewares: Array)
 
-**It's not real http request**
+Register Route
 
-##### Parameters
+|Name|default|description|
+-----|-------|-----------|
+|path|?|<https://github.com/RasCarlito/url-composer>|
+|callback|?|**Callback** after URL change|
+|middlewares|[]|Route **middlewares**|
 
-* path: Route path.
-* callback: Route Callback.
-* middlewares: Route **middlewares**.
-
-##### Usage
+#### Usage
 
 ```javascript
-Router.get('/user', ( /** Parameters */ ) => {
-  // ...
-}, [ /* middleware: Function */ ])
-```
-
-#### Router.post(path: string, callback: Function, middlewares: Array)
-
-**It's not real http request**
-
-##### Parameters
-
-* path: Route path.
-* callback: Callback after **request**.
-* middlewares: Route **middlewares**. 
-
-##### Usage
-
-```javascript
-Router.post('/user/create', ( /** Parameters */ ) => {
-  // ...
-}, [ /* middleware: Function */ ])
-```
-
-#### Router.use(path: string, router: historyRouter.Router)
-
-##### Parameters
-
-* path: Route base path.
-* router: The router which will be combined.
-
-##### Usage
-
-```javascript
-const user = require('./user');
-
-// path.join('/user', __ROUTE_PATH__)
-Router.use('/user', user);
-```
-
-#### Router.middleware(callback: Function)
-
-Setting **global** middleware. \
-You can use **parameters** such as ```formData```, ```redirect```. \
-must call ```next``` function for next middleware.
-
-##### Parameters
-
-* callback: middleware before Rouing.
-
-##### Usage
-
-```javascript
-Router.middleware(({ next }) => {
-  // ...
-
-  next(true);
-})
-```
-
-# Parameters
-
-### params 
-
-#### usage
-
-For ```get``` request
-
-```html
-<!-- http://__DOMAIN__/user?name=foo -->
-<a href="/user?name=foo" data-role="router-link">user</a>
-```
-
-```javascript
-Router.get('/user', ({ params }) => {
-  // { name: foo }
-  console.log(params);
-});
-```
-
-For ```post``` request
-
-```html
-<!-- http://__DOMAIN__/__BASE__/user?name=foo -->
-<a href="/user" data-method="post" data-params='{"name":"foo"}' data-role="router-link">user</a>
-```
-
-```javascript
-Router.post('/user', ({ params }) => {
-  // { name: foo }
-  console.log(params);
-});
-```
-
-### formData
-
-#### usage
-
-```html
-<!-- form -->
-<form method="get" action="/user" data-role="router-form">
-  <input type="text" placeholder="search..." name="search">
-  <input type="submit">
-</form>
-```
-
-```javascript
-// formData
-Router.get('/user', ({ formData }) => {
-  // { search: __VALUE__ }
-  console.log(formData);
-});
-```
-
-### redirect 
-
-#### usage
-
-```javascript
-// redirect
-Router.get('/user', function({ redirect }) {
-  redirect('/', null);
-});
-```
-
-### state 
-
-#### usage
-
-```javascript
-Router.get('/user', ({ redirect }) => {
-  // redirect
-  redirect('/user/list', { /** .. */ })
-});
-
-Router.get('/user/list', ({ state }) => {
+let userMiddleware = () => {
   /** ... */
-  console.log(state)
-})
+  return true;
+}
+/** Route '/user' with parameters */
+router.when('/user/:id', ({ params }) => console.log(params.id), [ userMiddleware ]);
 ```
 
-### request 
+### HistoryRouter.middleware(callback: Function)
 
-#### usage
+Register global middleware
+
+|Name|default|description|
+-----|-------|-----------|
+|callback|?|<https://github.com/ReactTraining/history>|
+
+#### Usage
 
 ```javascript
-Router.get('/user', ({ request }) => {
-  request({
-    url: '/user/profile',
-    method: 'post',
-    params: {
-      name: 'foo'
-    }
-  }).then((res) => {
-    // object
-    console.log(res)
-  })
-})
-
-Router.post('/user/profile', ({ done, params }) => {
-  // Parameters
-  console.log(params);
-  done({ /* Response */ })
-})
+router.middleware(() => console.log('Global middleware'));
 ```
 
-### done 
+## Callback Parameters
 
-#### usage
+|Name|description|
+-----|-----------|
+|state|push, or replace **state**|
+|params|URL **parameters**|
+
+### Usage
 
 ```javascript
-/** post */
-Router.post('/user', ({ done }) => {
-  done({
-    name: 'foo'
-  });
+/** Route '/user' with parameters */
+router.when('/user/:id', ({ params, state }) => {
+  /** 
+   * Don't using 'state' with Hash mode
+   * 
+   * params.id => 42 
+   * state.name => 'foo'
+   */
 });
-
-/** get */
-Router.get('/user', ({ request, done }) => {
-  request({
-    url: '/user',
-    method: 'post'
-  }).then((res) => {
-    // <h1>foo</h1>
-    done(`<h1>${res.name}</h1>`);
-  });
-});
+/** push, or replace */
+router.history.push('/user/42', {
+  name: 'foo'
+})
 ```
 
 # License
