@@ -6,52 +6,76 @@ import url from 'url-composer';
  * 
  * @param {Array} middlewares 
  */
-function middleware(middlewares) {
-  let isPassed = false;
-  /** assert Middleware */
-  if(middlewares.length) {
-    for(let i=0; i<middlewares.length; i++) {
-      isPassed = middlewares[i]();
-      if(!isPassed) return false;
-    }
-    return isPassed;
-  }
-  else return true;
+function middleware(middlewares, { from, to }, response = null) {
+	let next = (data) => response = data instanceof Function? data(): data;
+	/** assert Middleware */
+	if(middlewares.length) {
+		for(let i=0; i<middlewares.length; i++) {
+			middlewares[i]({ to, from, next, response });
+			if(!response) return false;
+		}
+		/** Passed all middlewares */
+		return response;
+	}
+	/** Midlewares are empty */
+	else return true;
 }
 
 /**
  * Assert
  * 
  * @param {HistoryRouter} router
- * @param {String} path
- * @param {Object} state
+ * @param {Location} to
  */
-function assert(router, path, state = undefined) {
-  for(let i=0; i<router._routes.length; i++) {
-    let route = router._routes[i],
-        isHit = url.test(router._options.hash 
-          ? { path: `/#/${route.path}`, url: `/#/${path}` }
-          : { path: route.path, url: path }
-        )
-    ;
-    if(isHit) {
-      let isPassed = false;
-      /** Global middlewares */
-      if(middleware(router._middlewares)) {
-        /** Route middlewares */
-        isPassed = middleware(route.middlewares);
-      };
-			/** It's passed all middlewares? */
-      if(isPassed) {
-        return {
-          callback: route.callback,
-          state,
-          params: url.parse({ path, definition: route.path, object: true })
-        };
-      }
-      else return false;
-    }
-  };
+function assert(router, to) {
+	/** Initialize */
+	let response = false,
+			path = `${to.pathname}${to.search}${to.hash}`,
+			where = { 
+				to, 
+				from: router.history.location 
+			};
+	;
+	for(let i=0; i<router.routes.length; i++) {
+		/** Current Route */
+		let route = router.routes[i],
+		 		is = url.test(router.options.hash 
+					? { path: `/#/${route.path}`, url: `/#/${path}` }
+					: { path: route.path, url: path }
+				)
+		;
+		if(is) {
+			/** Global middlewares */
+			if(response = middleware(router.middlewares, where)) {
+				/** Route middlewares */
+				if(route.middlewares.length) {
+					response = middleware(route.middlewares, where, response);
+				}
+			}
+			return response
+				? (location) => route.callback({
+						location, 
+						params: url.parse({ path, definition: route.path, object: true }), 
+						response 
+					})
+				: false;
+		}
+	};
+}
+
+/**
+ * Register history event handlers
+ * 
+ * @param {HistoryRouter} router 
+ */
+async function init(router) {
+	let response = false;
+	/** Blocking */
+	router.history.block((location) => response = assert(router, location));
+	/** Listening */
+	await router.history.listen((location) => response? response(location): null)
+	/** init: 'when('/' ...)' */
+	router.history.replace('/');
 }
 
 class HistoryRouter {
@@ -63,43 +87,30 @@ class HistoryRouter {
 	 */
 	 constructor(options = {}) {
 
-		/** 
-		 * private
-		 */
-		this._options = {
-			hash: options.hasOwnProperty('hash')? options.hash: true,
-			history: options.hasOwnProperty('history')? options.history: {}
+		/** Default */
+		this.options = {
+			hash: options.hasOwnProperty('hash')
+				? options.hash
+				: true,
+			history: options.hasOwnProperty('history')
+				? options.history
+				: {}
 		};
-		this._routes = new Array();
-		this._middlewares = new Array();
 
-		/** 
-		 * public
-		 */
+		/** Global middlewares */
+		this.middlewares = new Array(); 
 
-		this.history = this._options.hash
-			? createHashHistory(this._options.history)
-			: createBrowserHistory(this._options.history)
+		/** Registered routes */
+		this.routes = new Array(); 
+
+		/** History */
+		this.history = this.options.hash
+			? createHashHistory(this.options.history)
+			: createBrowserHistory(this.options.history)
 		;
 
-		let self = this,
-				isVerified = false
-		;
-		/** Assert before ... */
-		this.history.block((location) => {
-			/** Check routed path whether middleware is passed */
-			return isVerified = assert(self, `${location.pathname}${location.search}${location.hash}`, location.state);
-		});
-		(async function(self) {
-			/** Listening */
-			await self.history.listen((location) => {
-				if(isVerified) {
-					isVerified.callback({ state: isVerified.state, params: isVerified.params });
-				}
-			});
-			/** init: 'when('/' ...)' */
-			self.history.replace('/');
-		})(this);
+		/** Register history event handlers */
+		init(this);
 	}
 
 	/**
@@ -111,7 +122,7 @@ class HistoryRouter {
 	 */
 	when(path, callback, middlewares = []) {
 		/** Route */
-		this._routes.push({ path, callback, middlewares });
+		this.routes.push({ path, callback, middlewares });
 		return this;
 	}
 
@@ -122,7 +133,7 @@ class HistoryRouter {
 	 */
 	middleware(callback) {
 		/** Global middleware */
-		this._middlewares.push(callback);
+		this.middlewares.push(callback);
 		return this;
 	}
 }
