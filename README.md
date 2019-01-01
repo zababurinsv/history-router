@@ -168,8 +168,6 @@ router.history.push('/user/42', {
 
 ## Middleware
 
-## Route
-
 |Name|description|
 -----|-----------|
 |to|<https://github.com/ReactTraining/history#properties>|
@@ -190,18 +188,31 @@ router
      * location.state.name => 'foo'
      * response => 'Hello, world'
      */
-  }, [ ({ response, next }) => next(response) ])
+  }, 
+  [
+    /** Route middleware */
+    ({ to, from, next, response }) => { 
+      /**
+       * response => 'Hello, world'
+       */
+      next(response)
+    } 
+  ])
+  /** Global middleware */
   .middleware(({ to, from, next, response }) => {
     /** 
-     * '/' => '/user/42'
+     * First middleware
      * 
-     * to.location.pathname => '/user/42'
-     * to.params.id => 42
-     * from.location.pathname => '/'
+     * '/' => '/user/42'
      */
     next('Hello, world');
   })
-  .middleware(({ response, next }) => next(response))
+  .middleware(({ to, from, next, response }) => {
+    /**
+     * response => 'Hello, world'
+     */
+    next(response)
+  })
 ;
 /** push, or replace */
 router.history.push('/user/42', {

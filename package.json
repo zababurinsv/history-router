@@ -1,6 +1,6 @@
 {
   "name": "history-router",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Router for history",
   "main": "index.js",
   "unpkg": "dist/history-router.js",
