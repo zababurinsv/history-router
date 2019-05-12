@@ -2,33 +2,33 @@ import { createHashHistory, createBrowserHistory } from 'history';
 import url from 'url-composer';
 
 class HistoryRouter {
-	/**
-	 * Create this Instance
-	 * 
-	 * @param {Object} options
-	 */
-	 constructor(options = {}) {
+  /**
+   * Create this Instance
+   * 
+   * @param {Object} options
+   */
+   constructor(options = {}) {
      
-		/** Default */
-		this.options = {
-			hash: options.hasOwnProperty('hash')
-				? options.hash
-				: true,
-			history: options.hasOwnProperty('history')
-				? options.history
-				: {}
-		};
+    /** Default */
+    this.options = {
+      hash: options.hasOwnProperty('hash')
+        ? options.hash
+        : true,
+      history: options.hasOwnProperty('history')
+        ? options.history
+        : {}
+    };
 
-		/** Global middlewares */
-		this.middlewares = new Array(); 
+    /** Global middlewares */
+    this.middlewares = new Array(); 
 
-		/** Registered routes */
-		this.routes = new Array(); 
+    /** Registered routes */
+    this.routes = new Array(); 
 
-		/** History */
-		this.history = this.options.hash
-			? createHashHistory(this.options.history)
-			: createBrowserHistory(this.options.history)
+    /** History */
+    this.history = this.options.hash
+      ? createHashHistory(this.options.history)
+      : createBrowserHistory(this.options.history)
     ;
     
     /** Blocking */
@@ -91,31 +91,31 @@ class HistoryRouter {
         }
       };
     });
-	}
+  }
 
-	/**
-	 * Register Route
-	 * 
-	 * @param {String} path 
-	 * @param {Function} callback 
-	 * @param {Array} middlewares 
-	 */
-	when(path, callback, middlewares = []) {
-		/** Route */
-		this.routes.push({ path, callback, middlewares });
-		return this;
-	}
+  /**
+   * Register Route
+   * 
+   * @param {String} path 
+   * @param {Function} callback 
+   * @param {Array} middlewares 
+   */
+  when(path, callback, middlewares = []) {
+    /** Route */
+    this.routes.push({ path, callback, middlewares });
+    return this;
+  }
 
-	/**
-	 * Register global middleware
-	 * 
-	 * @param {Function} callback 
-	 */
-	middleware(callback) {
-		/** Global middleware */
-		this.middlewares.push(callback);
-		return this;
-	}
+  /**
+   * Register global middleware
+   * 
+   * @param {Function} callback 
+   */
+  middleware(callback) {
+    /** Global middleware */
+    this.middlewares.push(callback);
+    return this;
+  }
 }
 
 /** Only for CDN, or Bower */
