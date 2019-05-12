@@ -89,7 +89,6 @@ Create HistoryRouter Instance
 |Name|default|description|
 -----|-------|-----------|
 |hash|true|Using hash mode|
-|history|{}|<https://github.com/ReactTraining/history>|
 
 #### Usage
 
