@@ -13,18 +13,9 @@ class HistoryRouter {
     this.options = {
       hash: options.hasOwnProperty('hash')
         ? options.hash
-        : true,
-      history: options.hasOwnProperty('history')
-        ? options.history
-        : {}
+        : true
     };
-
-    /** Global middlewares */
-    this.middlewares = new Array(); 
-
-    /** Registered routes */
-    this.routes = new Array(); 
-
+    
     /** History */
     this.history = this.options.hash
       ? createHashHistory(this.options.history)
@@ -91,6 +82,12 @@ class HistoryRouter {
         }
       };
     });
+
+    /** Registered routes */
+    this.routes = new Array();
+
+    /** Global middlewares */
+    this.middlewares = new Array(); 
   }
 
   /**
