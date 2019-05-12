@@ -20,9 +20,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    "history-router": [ 
-      path.resolve(__dirname, './index.js') 
-    ]
+    "history-router": path.resolve(__dirname, './index.js')
   },
   devtool: 'inline-source-map',
   devServer: {
