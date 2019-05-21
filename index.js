@@ -1,116 +1,115 @@
 import { createHashHistory, createBrowserHistory } from 'history';
 import url from 'url-composer';
 
+import Route from './lib/Route';
+import Middleware from './lib/Middleware';
+
 class HistoryRouter {
   /**
-   * Create this Instance
+   * Create HistoryRouter Instance
    * 
-   * @param {Object} options
+   * @param {Boolean} hash
    */
-   constructor(options = {}) {
-     
-    /** Default */
-    this.options = {
-      hash: options.hasOwnProperty('hash')
-        ? options.hash
-        : true
-    };
+   constructor(hash) {
+   /**
+     * @property {History} history
+     */
+    this.history = hash? createHashHistory(): createBrowserHistory();
     
-    /** History */
-    this.history = this.options.hash
-      ? createHashHistory(this.options.history)
-      : createBrowserHistory(this.options.history)
-    ;
-    
-    /** Blocking */
-    this.history.block(location => {
-      /** Initialize */
-      let path = `${location.pathname}${location.search}${location.hash}`,
-          where = { 
-            to: location, 
-            from: this.history.location 
-          },
-          response = false
-      ;
-      for(let i = 0; i < this.routes.length; i++) {
-        /** Current Route */
-        let route = this.routes[i],
-            isCorrectUrl = url.test(this.options.hash 
-              ? { path: `/#/${route.path}`, url: `/#/${path}` }
-              : { path: route.path, url: path }
-            )
-        ;
-        if(isCorrectUrl) {
-          /**
-           * Run middlewares
-           * 
-           * @param {Array} middlewares 
-           */
-          let middleware = (middlewares, { from, to }, response = null) => {
-            /** assert Middleware */
-            if(middlewares.length) {
-              let next = data => response = data instanceof Function? data(): data;
-              for(let i = 0; i < middlewares.length; i++) {
-                middlewares[i]({ to, from, next, response });
-                if(!response) {
-                  return false;
-                }
-              }
-              /** Passed all middlewares */
-              return response;
-            } else {
-              /** Midlewares are empty */
-              return true;
-            }
-          };
-          /** Global middlewares */
-          if(response = middleware(this.middlewares, where)) {
-            /** Route middlewares */
-            if(route.middlewares.length) {
-              response = middleware(route.middlewares, where, response);
-            }
-          }
-          if(response) {
-            return route.callback({
-              location, 
-              params: url.parse({ path, definition: route.path, object: true }), 
-              response
-            });
-          } else {
-            return false;
-          }
-        }
-      };
-    });
-
-    /** Registered routes */
+    /**
+     * @property {Route[]}
+     */
     this.routes = new Array();
 
-    /** Global middlewares */
+    /**
+     * @property {Middleware[]}
+     */
     this.middlewares = new Array(); 
+
+
+    /** Blocking */
+    this.history.block(location => this._block(location, hash));
+  }
+
+  /**
+   * Blocking
+   * 
+   * @param {Location} location 
+   * @param {Boolean} hash
+   */
+  _block(location, hash) {
+    let path = `${location.pathname}${location.search}${location.hash}`,
+        to = location, 
+        from = this.history.location
+    ;
+    let response = false;
+    for(let i = 0; i < this.routes.length; i++) {
+      if(this.routes[i].validate(path, hash)) {
+        if(response = this._validateFromMiddlewares(this.middlewares, { to, from })) {
+          if(this.routes[i].middlewares.length > 0 && response) {
+            response = this._validateFromMiddlewares(
+              this.routes[i].middlewares,
+              { to, from },
+              response
+            );
+          }
+        }
+        if(response) {
+          return this.routes[i].run(
+            location, 
+            url.parse({ path, definition: this.routes[i].path, object: true }), 
+            response
+          );
+        }
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Validate from middlewares
+   * 
+   * @param {Middleware[]} middlewares 
+   * @param {Object} location 
+   * @param {*} response 
+   */
+  _validateFromMiddlewares(middlewares, { from, to }, response = null) {
+    if(middlewares.length > 0) {
+      for(let i = 0; i < middlewares.length; i++) {
+        response = middlewares[i].run({ to, from }, response);
+        if(!response) {
+          return false;
+        }
+      }
+      return response;
+    }
+    return true;
   }
 
   /**
    * Register Route
    * 
    * @param {String} path 
-   * @param {Function} callback 
+   * @param {Function} cb 
    * @param {Array} middlewares 
    */
-  when(path, callback, middlewares = []) {
+  when(path, cb, middlewares = []) {
+    for(let i = 0; i < middlewares.length; i++) {
+      middlewares[i] = new Middleware(middlewares[i])
+    }
     /** Route */
-    this.routes.push({ path, callback, middlewares });
+    this.routes.push(new Route(path, cb, middlewares));
     return this;
   }
 
   /**
    * Register global middleware
    * 
-   * @param {Function} callback 
+   * @param {Function} cb 
    */
-  middleware(callback) {
+  middleware(cb) {
     /** Global middleware */
-    this.middlewares.push(callback);
+    this.middlewares.push(new Middleware(cb));
     return this;
   }
 }

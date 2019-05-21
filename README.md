@@ -44,9 +44,7 @@ import HistoryRouter from 'history-router'
 <script src="https://unpkg.com/history-router"></script>
 <script>
   let link = document.getElementsByTagName('a')[0],
-      router = new HistoryRouter({
-        hash: false // default: true
-      })
+      router = new HistoryRouter(true)
   ;
   /** Route '/user' with parameters */
   router.when('/user/:id', ({ params }) => console.log(params.id));
@@ -60,58 +58,46 @@ import HistoryRouter from 'history-router'
 </script>
 ```
 
-```javascript
-const HistoryRouter = require('history-router');
-
-/** history-router Router **/
-const router = new HistoryRouter({ hash: false });
-// ...
-
-/** Route '/user' with parameters */
-router.when('/user/:id', ({ params }) => console.log(params.id));
-```
-
 # Properties
 
-|Name|default|description|
------|-------|-----------|
-|options|{}|History Options|
-|middlewares|[]|Registered **global middlewares**|
-|routes|[]|Registered **routes**|
-|history|?|<https://github.com/ReactTraining/history>|
+|Name|description|
+-----|-----------|
+|middlewares|Registered **global middlewares**|
+|routes|Registered **routes**|
+|history|<https://github.com/ReactTraining/history>|
 
 # Methods
 
-### HistoryRouter(options: object)
+### HistoryRouter(hash: Boolean)
 
 Create HistoryRouter Instance
 
-|Name|default|description|
------|-------|-----------|
-|hash|true|Using hash mode|
+|Name|description|
+-----|-----------|
+|hash|Using hash mode|
 
 #### Usage
 
 ```javascript
-let router = new HistoryRouter({ hash: false });
+let router = new HistoryRouter(false);
 ```
 
 ### HistoryRouter.when(path: string, callback: Function, middlewares: Array): HistoryRouter
 
 Register Route
 
-|Name|default|description|
------|-------|-----------|
-|path|?|<https://github.com/RasCarlito/url-composer>|
-|callback|?|**Callback** after URL change|
-|middlewares|[]|Route **middlewares**|
+|Name|description|
+-----|-----------|
+|path|<https://github.com/RasCarlito/url-composer>|
+|callback|**Callback** after URL change|
+|middlewares|Route **middlewares**|
 
 #### Usage
 
 ```javascript
-let userMiddleware = ({ next }) => {
+let userMiddleware = () => {
   /** ... */
-  next(true);
+  return true;
 }
 /** Route '/user' with parameters */
 router.when('/user/:id', ({ params }) => console.log(params.id), [ userMiddleware ]);
@@ -121,23 +107,23 @@ router.when('/user/:id', ({ params }) => console.log(params.id), [ userMiddlewar
 
 Register global middleware
 
-|Name|default|description|
------|-------|-----------|
-|callback|?|Global **middleware** callback|
+|Name|description|
+-----|-----------|
+|callback|Global **middleware** callback|
 
 #### Usage
 
 ```javascript
-let globalMiddleware = ({ next }) => {
+let globalMiddleware = () => {
   /** ... */
-  next(true);
+  return true;
 }
 router.middleware(globalMiddleware);
 ```
 
 # How to use
 
-## Route
+### Route
 
 |Name|description|
 -----|-----------|
@@ -145,7 +131,7 @@ router.middleware(globalMiddleware);
 |params|URL **parameters**|
 |response|middleware **response**|
 
-### Usage
+#### Usage
 
 ```javascript
 /** Route '/user' with parameters */
@@ -157,7 +143,7 @@ router.when('/user/:id', ({ location, params, response }) => {
    * location.state.name => 'foo'
    * response => 'foo'
    */
-}, [ ({ next }) => next('foo') ]);
+}, [ () => 'foo' ]);
 
 /** push, or replace */
 router.history.push('/user/42', {
@@ -165,16 +151,15 @@ router.history.push('/user/42', {
 })
 ```
 
-## Middleware
+### Middleware
 
 |Name|description|
 -----|-----------|
 |to|<https://github.com/ReactTraining/history#properties>|
 |from|<https://github.com/ReactTraining/history#properties>|
-|next|Go to next middleware, or rotue callback|
 |response|last Middleware **response**|
 
-### Usage
+#### Usage
 
 ```javascript
 /** Route '/user' with parameters */
@@ -187,64 +172,37 @@ router
      * location.state.name => 'foo'
      * response => 'Hello, world'
      */
+    console.log(response);
   }, 
   [
     /** Route middleware */
-    ({ to, from, next, response }) => { 
+    ({ to, from, response }) => { 
       /**
        * response => 'Hello, world'
        */
-      next(response)
+      return response;
     } 
   ])
   /** Global middleware */
-  .middleware(({ to, from, next, response }) => {
+  .middleware(({ to, from, response }) => {
     /** 
      * First middleware
      * 
      * '/' => '/user/42'
      */
-    next('Hello, world');
+    return 'Hello, world';
   })
-  .middleware(({ to, from, next, response }) => {
+  .middleware(({ to, from, response }) => {
     /**
      * response => 'Hello, world'
      */
-    next(response)
+    return response;
   })
 ;
 /** push, or replace */
 router.history.push('/user/42', {
   name: 'foo'
 })
-```
-
-# Advanced
-
-### Next
-
-```javascript
-route.middleware(({ next }) => {
-  /**
-   * next(false) => Failed
-   * next(<Somthing without 'false'>): next('foo')
-   * next(<Function>): next(() => true)
-   */ 
-});
-```
-
-### Async Function
-
-```javascript
-import axios from 'axios';
-
-router
-  /** Global middleware */
-  .middleware(({ next }) => {
-    /** 'next' with Promise */
-    next(() => axios.get('...'));
-  })
-  .when('/', async ({ response }) => console.log(await response))
 ```
 
 # License
