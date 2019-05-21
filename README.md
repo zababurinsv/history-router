@@ -127,7 +127,8 @@ router.middleware(globalMiddleware);
 
 |Name|description|
 -----|-----------|
-|location|<https://github.com/ReactTraining/history#properties>|
+|to|<https://github.com/ReactTraining/history#properties>|
+|from|<https://github.com/ReactTraining/history#properties>|
 |params|URL **parameters**|
 |response|middleware **response**|
 
@@ -135,12 +136,12 @@ router.middleware(globalMiddleware);
 
 ```javascript
 /** Route '/user' with parameters */
-router.when('/user/:id', ({ location, params, response }) => {
+router.when('/user/:id', ({ to, from, params, response }) => {
   /**
    * Don't using 'state' with Hash mode
    * 
    * params.id => 42 
-   * location.state.name => 'foo'
+   * to.state.name => 'foo'
    * response => 'foo'
    */
 }, [ () => 'foo' ]);
@@ -164,12 +165,12 @@ router.history.push('/user/42', {
 ```javascript
 /** Route '/user' with parameters */
 router
-  .when('/user/:id', ({ location, params, response }) => {
+  .when('/user/:id', ({ to, from, params, response }) => {
     /** 
      * Don't using 'state' with Hash mode
      * 
      * params.id => 42 
-     * location.state.name => 'foo'
+     * to.state.name => 'foo'
      * response => 'Hello, world'
      */
     console.log(response);

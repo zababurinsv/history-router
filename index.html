@@ -1,0 +1,48 @@
+<a href="#">Link to somewhere</a>
+
+<script src="http://localhost:8080/dist/history-router.js"></script>
+<script>
+  let link = document.getElementsByTagName('a')[0],
+      router = new HistoryRouter(false)
+  ;
+  router
+  .when('/user/:id', ({ to, from, params, response }) => {
+    /** 
+     * Don't using 'state' with Hash mode
+     * 
+     * params.id => 42 
+     * location.state.name => 'foo'
+     * response => 'Hello, world'
+     */
+    console.log(to, from);
+  }, 
+  [
+    /** Route middleware */
+    ({ to, from, response }) => { 
+      /**
+       * response => 'Hello, world'
+       */
+      return response;
+    } 
+  ])
+  /** Global middleware */
+  .middleware(({ to, from, response }) => {
+    /** 
+     * First middleware
+     * 
+     * '/' => '/user/42'
+     */
+    return 'Hello, world';
+  })
+  .middleware(({ to, from, response }) => {
+    /**
+     * response => 'Hello, world'
+     */
+    return response;
+  })
+;
+/** push, or replace */
+router.history.push('/user/42', {
+  name: 'foo'
+})
+</script>

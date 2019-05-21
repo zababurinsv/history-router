@@ -56,7 +56,7 @@ class HistoryRouter {
         }
         if(response) {
           return this.routes[i].run(
-            location, 
+            { to, from }, 
             url.parse({ path, definition: this.routes[i].path, object: true }), 
             response
           );
