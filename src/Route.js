@@ -34,7 +34,7 @@ class Route {
    * @param {*} response
    */
   run (from, to, params, response) {
-    this.cb({ to, from, params, response })
+    this.cb({ from, to, params, response })
   }
 
   /**

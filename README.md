@@ -1,6 +1,6 @@
 # history-router
 
-Router for history
+This is a **Router** with [history](https://github.com/ReactTraining/history).
 
 ## Installation
 
@@ -35,7 +35,7 @@ router.history.push('/user/32')
 
 ### HistoryRouter(hash: Boolean = true)
 
-Create HistoryRouter Instance
+Create **HistoryRouter** Instance.
 
 |Name|description|
 -----|-----------|
@@ -47,7 +47,7 @@ const router = new HistoryRouter(false)
 
 ### HistoryRouter.when(path: string, callback: Function, middlewares: Array = []): void
 
-Register Route
+Register a **new Route**.
 
 |Name|description|
 -----|-----------|
@@ -55,33 +55,26 @@ Register Route
 |callback|**Callback** after URL change|
 |middlewares|Route **middlewares**|
 
-#### Callback
+#### Callback Parameters
 
 |Name|description|
 -----|-----------|
-|to|<https://github.com/ReactTraining/history#properties>|
 |from|<https://github.com/ReactTraining/history#properties>|
+|to|<https://github.com/ReactTraining/history#properties>|
 |params|URL **parameters**|
 |response|middleware **response**|
 
 ```javascript
 /** Route '/user' with parameters */
-router.when('/user/:id', ({ to, from, params, response }) => {
+router.when('/user/:id', ({ from, to, params, response }) => {
   /**
-   * Don't using 'state' with Hash mode
-   *
-   * params.id => 42
-   * to.state.name => 'foo'
    * response => 'Hello, world'
    */
   console.log(response)
 },
 [
   /** Route middleware */
-  ({ to, from, response }) => {
-    /**
-     * response => 'Hello, world'
-     */
+  ({ from, to, response }) => {
     return 'Hello, world'
   }
 ])
@@ -89,31 +82,26 @@ router.when('/user/:id', ({ to, from, params, response }) => {
 
 ### HistoryRouter.middleware(callback: Function): void
 
-Register global middleware
+Register a **Global middleware**.
 
 |Name|description|
 -----|-----------|
 |callback|Global **middleware** callback|
 
-#### Callback
+#### Callback Parameters
 
 |Name|description|
 -----|-----------|
-|to|<https://github.com/ReactTraining/history#properties>|
 |from|<https://github.com/ReactTraining/history#properties>|
+|to|<https://github.com/ReactTraining/history#properties>|
 |response|last Middleware **response**|
 
 ```javascript
 /** Global middleware */
-router.middleware(({ to, from, response }) => {
-  /**
-   * First middleware
-   *
-   * '/' => '/user/42'
-   */
+router.middleware(({ from, to, response }) => {
   return 'Hello, world'
 })
-router.middleware(({ to, from, response }) => {
+router.middleware(({ from, to, response }) => {
   /**
    * response => 'Hello, world'
    */
