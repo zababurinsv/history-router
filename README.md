@@ -2,73 +2,38 @@
 
 Router for history
 
-# Installation
-
-```bash
-bower install history-router --save
-```
-
-or,
+## Installation
 
 ```bash
 npm install --save history-router
 ```
 
-# Includes
-
-with **bower**
-
-```html
-<body>
-  <script src="bower_components/history-router/dist/history-router.js"></script>
-</body>
-```
-
-or **cdn**
-
-```html
-<script src="https://unpkg.com/history-router"></script>
-```
-
-with **Bundlers** webpack etc.
+## Basic usage
 
 ```javascript
 import HistoryRouter from 'history-router'
+
+const router = new HistoryRouter()
+
+/** Route '/user' with parameters */
+router.when('/user/:id', ({ params }) => {
+  // 32
+  console.log(params.id)
+})
+
+/** https://github.com/ReactTraining/history */
+router.history.push('/user/32')
 ```
 
-# Basic usage
-
-```html
-<a href="#">Link to somewhere</a>
-
-<script src="https://unpkg.com/history-router"></script>
-<script>
-  let link = document.getElementsByTagName('a')[0],
-      router = new HistoryRouter(true)
-  ;
-  /** Route '/user' with parameters */
-  router.when('/user/:id', ({ params }) => console.log(params.id));
-  
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    /** https://github.com/ReactTraining/history */
-    router.history.push('/user/32');
-  });
-</script>
-```
-
-# Properties
+## Properties
 
 |Name|description|
 -----|-----------|
-|middlewares|Registered **global middlewares**|
-|routes|Registered **routes**|
 |history|<https://github.com/ReactTraining/history>|
 
-# Methods
+## Methods
 
-### HistoryRouter(hash: Boolean)
+### HistoryRouter(hash: Boolean = true)
 
 Create HistoryRouter Instance
 
@@ -76,13 +41,11 @@ Create HistoryRouter Instance
 -----|-----------|
 |hash|Using hash mode|
 
-#### Usage
-
 ```javascript
-let router = new HistoryRouter(false);
+const router = new HistoryRouter(false)
 ```
 
-### HistoryRouter.when(path: string, callback: Function, middlewares: Array): HistoryRouter
+### HistoryRouter.when(path: string, callback: Function, middlewares: Array = []): void
 
 Register Route
 
@@ -92,38 +55,7 @@ Register Route
 |callback|**Callback** after URL change|
 |middlewares|Route **middlewares**|
 
-#### Usage
-
-```javascript
-let userMiddleware = () => {
-  /** ... */
-  return true;
-}
-/** Route '/user' with parameters */
-router.when('/user/:id', ({ params }) => console.log(params.id), [ userMiddleware ]);
-```
-
-### HistoryRouter.middleware(callback: Function): HistoryRouter
-
-Register global middleware
-
-|Name|description|
------|-----------|
-|callback|Global **middleware** callback|
-
-#### Usage
-
-```javascript
-let globalMiddleware = () => {
-  /** ... */
-  return true;
-}
-router.middleware(globalMiddleware);
-```
-
-# How to use
-
-### Route
+#### Callback
 
 |Name|description|
 -----|-----------|
@@ -132,27 +64,38 @@ router.middleware(globalMiddleware);
 |params|URL **parameters**|
 |response|middleware **response**|
 
-#### Usage
-
 ```javascript
 /** Route '/user' with parameters */
 router.when('/user/:id', ({ to, from, params, response }) => {
   /**
    * Don't using 'state' with Hash mode
-   * 
-   * params.id => 42 
+   *
+   * params.id => 42
    * to.state.name => 'foo'
-   * response => 'foo'
+   * response => 'Hello, world'
    */
-}, [ () => 'foo' ]);
-
-/** push, or replace */
-router.history.push('/user/42', {
-  name: 'foo'
-})
+  console.log(response)
+},
+[
+  /** Route middleware */
+  ({ to, from, response }) => {
+    /**
+     * response => 'Hello, world'
+     */
+    return 'Hello, world'
+  }
+])
 ```
 
-### Middleware
+### HistoryRouter.middleware(callback: Function): void
+
+Register global middleware
+
+|Name|description|
+-----|-----------|
+|callback|Global **middleware** callback|
+
+#### Callback
 
 |Name|description|
 -----|-----------|
@@ -160,54 +103,26 @@ router.history.push('/user/42', {
 |from|<https://github.com/ReactTraining/history#properties>|
 |response|last Middleware **response**|
 
-#### Usage
-
 ```javascript
-/** Route '/user' with parameters */
-router
-  .when('/user/:id', ({ to, from, params, response }) => {
-    /** 
-     * Don't using 'state' with Hash mode
-     * 
-     * params.id => 42 
-     * to.state.name => 'foo'
-     * response => 'Hello, world'
-     */
-    console.log(response);
-  }, 
-  [
-    /** Route middleware */
-    ({ to, from, response }) => { 
-      /**
-       * response => 'Hello, world'
-       */
-      return response;
-    } 
-  ])
-  /** Global middleware */
-  .middleware(({ to, from, response }) => {
-    /** 
-     * First middleware
-     * 
-     * '/' => '/user/42'
-     */
-    return 'Hello, world';
-  })
-  .middleware(({ to, from, response }) => {
-    /**
-     * response => 'Hello, world'
-     */
-    return response;
-  })
-;
-/** push, or replace */
-router.history.push('/user/42', {
-  name: 'foo'
+/** Global middleware */
+router.middleware(({ to, from, response }) => {
+  /**
+   * First middleware
+   *
+   * '/' => '/user/42'
+   */
+  return 'Hello, world'
+})
+router.middleware(({ to, from, response }) => {
+  /**
+   * response => 'Hello, world'
+   */
+  return response
 })
 ```
 
-# License
+## License
 
-MIT
+[MIT](https://github.com/pronist/history-router/blob/master/LICENSE)
 
-Copyright (c) Mansu Jeong. All rights reserved.
+Copyright 2018-2020. [SangWoo Jeong](https://github.com/pronist). All rights reserved.

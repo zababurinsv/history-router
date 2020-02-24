@@ -1,13 +1,11 @@
 {
   "name": "history-router",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Router for history",
   "main": "index.js",
-  "unpkg": "dist/history-router.js",
-  "jsdelivr": "dist/history-router.js",
   "scripts": {
     "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "build": "node ./node_modules/webpack/bin/webpack"
+    "lint": "eslint index.js src"
   },
   "repository": {
     "type": "git",
@@ -18,23 +16,27 @@
     "router"
   ],
   "files": [
-    "dist",
-    "lib",
+    "src",
     "index.js",
     "LICENSE",
     "README.md"
   ],
-  "author": "MansuJeong <pronist@naver.com>",
   "license": "MIT",
   "dependencies": {
     "history": "^4.7.2",
     "url-composer": "^1.15.0"
   },
   "devDependencies": {
-    "clean-webpack-plugin": "^1.0.0",
     "html-webpack-plugin": "^3.2.0",
     "uglifyjs-webpack-plugin": "^1.3.0",
     "webpack": "^3.12.0",
-    "webpack-dev-server": "^2.11.3"
+    "webpack-dev-server": "^2.11.3",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
